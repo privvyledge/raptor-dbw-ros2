@@ -51,6 +51,8 @@ from launch import LaunchDescription
 from launch.substitutions import LaunchConfiguration
 from launch.substitutions import ThisLaunchFileDir
 from launch_ros.actions import Node
+from launch.actions import DeclareLaunchArgument
+from launch.conditions import IfCondition
 
 
 def generate_launch_description():
@@ -64,6 +66,11 @@ def generate_launch_description():
 
     return LaunchDescription(
         [
+            DeclareLaunchArgument(
+                    'launch_joystick_driver',
+                    default_value='True'
+            ),
+
             Node(
                 package='raptor_dbw_can',
                 executable='raptor_dbw_can_node',
@@ -92,7 +99,8 @@ def generate_launch_description():
                 executable='joy_node',
                 output='screen',
                 namespace='raptor_dbw_interface',
-                parameters=[params_file]
+                parameters=[params_file],
+                condition=IfCondition(LaunchConfiguration("launch_joystick_driver"))
             )
         ])
 
