@@ -1,7 +1,7 @@
 /**:
   ros__parameters:
   # Kvaser node parameters
-    hardware_id: 22024
+    hardware_id: 18205  # 22024
     circuit_id: 0
     bit_rate: 500000
     enable_echo: false
@@ -13,7 +13,7 @@
     max_steer_angle: 470.0
   # joy node
     device_id: 0
-    device_name: "/dev/input/js0"
+#    device_name: "/dev/input/js0"
     deadzone: 0.5
     autorepeat_rate: 20.0
     sticky_buttons: false
