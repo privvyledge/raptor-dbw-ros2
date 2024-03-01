@@ -74,8 +74,8 @@ typedef struct
   int turn_signal_cmd;
   bool joy_accelerator_pedal_valid;
   bool joy_brake_valid;
-//  float accel_limit;
-//  float decel_limit;
+  float accel_limit;
+  float decel_limit;
 } JoystickDataStruct;
 
 /** \brief Class for sending control commands to NE Raptor DBW with a joystick. */

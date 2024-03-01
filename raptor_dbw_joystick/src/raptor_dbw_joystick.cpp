@@ -68,6 +68,8 @@ RaptorDbwJoystick::RaptorDbwJoystick(
   data_.turn_signal_cmd = TurnSignal::NONE;
   data_.joy_accelerator_pedal_valid = false;
   data_.joy_brake_valid = false;
+  data_.accel_limit = max_accel_;
+  data_.decel_limit = max_decel_;
 
   joy_.axes.resize(AXIS_COUNT, 0);
   joy_.buttons.resize(BTN_COUNT, 0);
@@ -126,7 +128,7 @@ void RaptorDbwJoystick::cmdCallback()
   else {
         accelerator_pedal_msg.speed_cmd = data_.accelerator_pedal_joy; //
         accelerator_pedal_msg.road_slope = 0;  // todo: get from localization topic
-        accelerator_pedal_msg.accel_limit = max_accel_;
+        accelerator_pedal_msg.accel_limit = data_.accel_limit;
         accelerator_pedal_msg.control_type.value = raptor_dbw_msgs::msg::ActuatorControlMode::CLOSED_LOOP_VEHICLE;
   }
 
@@ -145,7 +147,7 @@ void RaptorDbwJoystick::cmdCallback()
   }
   else {
         brake_msg.control_type.value = raptor_dbw_msgs::msg::ActuatorControlMode::CLOSED_LOOP_VEHICLE;
-        brake_msg.decel_limit = max_decel_;
+        brake_msg.decel_limit = data_.decel_limit;
   }
 
   pub_brake_->publish(brake_msg);
@@ -213,6 +215,8 @@ void RaptorDbwJoystick::recvJoy(const Joy::SharedPtr msg)
     data_.joy_brake_valid = true;
   }
 
+  data_.accel_limit = max_accel_;
+  data_.decel_limit = max_decel_;
   // Accelerator pedal
   if (data_.joy_accelerator_pedal_valid) {
     if (raw_control_) {
@@ -220,7 +224,8 @@ void RaptorDbwJoystick::recvJoy(const Joy::SharedPtr msg)
     }
     else {
         if (msg->axes[AXIS_ACCELERATOR_PEDAL] < 0.0) {
-            data_.accel_decel_limits = 0;
+            data_.accel_limit = 0;
+            data_.decel_limit = 0;
         }
     }
   }
