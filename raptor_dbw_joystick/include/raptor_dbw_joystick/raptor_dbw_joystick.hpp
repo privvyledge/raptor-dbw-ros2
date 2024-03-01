@@ -141,13 +141,13 @@ private:
   bool enable_;     // Use enable and disable buttons
   double svel_;     // Steering command speed
   float max_steer_angle_;  // Maximum steering angle allowed
-  bool raw_control;  // actuation type
-  double max_accelerator_pedal;  // maximum accelerator pedal allowed
-  double max_speed;  // maximum speed allowed
-//  double min_speed;
-  double max_accel;  // maximum acceleration
-  double max_decel;  // maximum deceleration
-  double speed_increment;  //
+  bool raw_control_;  // actuation type
+  double max_accelerator_pedal_;  // maximum accelerator pedal allowed
+  double max_speed_;  // maximum speed allowed
+//  double min_speed_;
+  double max_accel_;  // maximum acceleration
+  double max_decel_;  // maximum deceleration
+  double speed_increment_;  //
 
   // Variables
   rclcpp::TimerBase::SharedPtr timer_;
@@ -175,7 +175,7 @@ private:
     AXIS_STEER_1 = 0,             /**< Axis: steering wheel: - = clockwise, + = counterclockwise */
     AXIS_STEER_2 = 3,             /**< Axis: steering wheel: - = clockwise, + = counterclockwise */
     AXIS_TURN_SIG = 6,            /**< Axis: turn signals: - = right, + = left */
-    AXIS_SPEED_INCREMENT = 7      /**< Axis: speed_increment: - = down_arrow, + = up_ */
+    AXIS_SPEED_INCREMENT = 7,      /**< Axis: speed_increment: - = down_arrow, + = up_ */
     AXIS_COUNT = 8,               /**< Total number of axes (including unused) */
   };
 };
