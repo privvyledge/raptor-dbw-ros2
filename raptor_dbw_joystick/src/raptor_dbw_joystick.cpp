@@ -127,7 +127,7 @@ void RaptorDbwJoystick::cmdCallback()
         accelerator_pedal_msg.speed_cmd = data_.accelerator_pedal_joy; //
         accelerator_pedal_msg.road_slope = 0;  // todo: get from localization topic
         accelerator_pedal_msg.accel_limit = max_accel_;
-        accelerator_pedal_msg.control_type.value = raptor_dbw_msgs::ActuatorControlMode::CLOSED_LOOP_VEHICLE;
+        accelerator_pedal_msg.control_type.value = raptor_dbw_msgs::msg::ActuatorControlMode::CLOSED_LOOP_VEHICLE;
   }
 
   pub_accelerator_pedal_->publish(accelerator_pedal_msg);
@@ -144,7 +144,7 @@ void RaptorDbwJoystick::cmdCallback()
         brake_msg.control_type.value = raptor_dbw_msgs::msg::ActuatorControlMode::OPEN_LOOP;
   }
   else {
-        brake_msg.control_type.value = raptor_dbw_msgs::ActuatorControlMode::closed_loop_vehicle;
+        brake_msg.control_type.value = raptor_dbw_msgs::msg::ActuatorControlMode::CLOSED_LOOP_VEHICLE;
         brake_msg.decel_limit = max_decel_;
   }
 
