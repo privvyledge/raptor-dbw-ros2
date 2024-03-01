@@ -44,10 +44,27 @@ int main(int argc, char ** argv)
   temp->declare_parameter("svel", rclcpp::PARAMETER_DOUBLE);
   temp->declare_parameter("max_steer_angle", rclcpp::PARAMETER_DOUBLE);
 
+  // parameters to setup speed or raw control
+  temp->declare_parameter("raw_control", rclcpp::PARAMETER_BOOL);  // True: open_loop or raw, False:  closed_loop or speed
+  temp->declare_parameter("max_accelerator_pedal", rclcpp::PARAMETER_DOUBLE);  // for raw mode
+  temp->declare_parameter("max_speed", rclcpp::PARAMETER_DOUBLE);  // for speed mode
+//  temp->declare_parameter("min_speed", rclcpp::PARAMETER_DOUBLE);  // for speed mode
+  temp->declare_parameter("max_accel", rclcpp::PARAMETER_DOUBLE);  // for speed mode
+  temp->declare_parameter("max_decel", rclcpp::PARAMETER_DOUBLE);  // for speed mode
+  temp->declare_parameter("speed_increment", rclcpp::PARAMETER_DOUBLE);  // for speed mode
+
   bool n_ignore = temp->get_parameter("ignore").as_bool();
   bool n_enable = temp->get_parameter("enable").as_bool();
   double n_svel = temp->get_parameter("svel").as_double();
   float n_max_steer_angle = temp->get_parameter("max_steer_angle").as_double();
+  // parameters to setup speed or raw control
+  bool n_raw_control = temp->get_parameter("raw_control").as_bool();
+  float n_max_accelerator_pedal = temp->get_parameter("max_accelerator_pedal").as_double();
+  float n_max_speed = temp->get_parameter("max_speed").as_double();
+//  float n_min_speed = temp->get_parameter("min_speed").as_double();
+  float n_max_accel = temp->get_parameter("max_accel").as_double();
+  float n_max_decel = temp->get_parameter("max_decel").as_double();
+  float n_speed_increment = temp->get_parameter("speed_increment").as_double();
 
   // Create RaptorDbwJoystick class
   auto node = std::make_shared<raptor_dbw_joystick::RaptorDbwJoystick>(
@@ -55,7 +72,14 @@ int main(int argc, char ** argv)
     n_ignore,
     n_enable,
     n_svel,
-    n_max_steer_angle
+    n_max_steer_angle,
+    n_raw_control,
+    n_max_accelerator_pedal,
+    n_max_speed,
+//    n_min_speed,
+    n_max_accel,
+    n_max_decel,
+    n_speed_increment
   );
 
   exec.add_node(node->get_node_base_interface());

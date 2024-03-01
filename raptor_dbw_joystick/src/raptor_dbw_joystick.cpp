@@ -38,12 +38,27 @@ RaptorDbwJoystick::RaptorDbwJoystick(
   bool ignore,
   bool enable,
   double svel,
-  float max_steer_angle)
+  float max_steer_angle,
+  bool raw_control,
+  double max_accelerator_pedal,
+  double max_speed,
+//  double min_speed,
+  double max_accel,
+  double max_decel,
+  double speed_increment
+  )
 : Node("raptor_dbw_joystick_node", options),
   ignore_{ignore},
   enable_{enable},
   svel_{svel},
-  max_steer_angle_{max_steer_angle}
+  max_steer_angle_{max_steer_angle},
+  raw_control_{raw_control},
+  max_accelerator_pedal_{max_accelerator_pedal},
+  max_speed_{max_speed},
+//  min_speed_{min_speed},
+  max_accel_{max_accel},
+  max_decel_{max_decel},
+  speed_increment_{speed_increment}
 {
   data_.brake_joy = 0.0;
   data_.gear_cmd = Gear::NONE;
@@ -98,8 +113,23 @@ void RaptorDbwJoystick::cmdCallback()
   accelerator_pedal_msg.enable = true;
   accelerator_pedal_msg.ignore = ignore_;
   accelerator_pedal_msg.rolling_counter = counter_;
-  accelerator_pedal_msg.pedal_cmd = data_.accelerator_pedal_joy * 100;
-  accelerator_pedal_msg.control_type.value = raptor_dbw_msgs::msg::ActuatorControlMode::OPEN_LOOP;
+  /*
+  Accelerator pedal control types:
+    * ActuatorControlMode::OPEN_LOOP = Open Loop Pedal %-Positon
+    * ActuatorControlMode::CLOSED_LOOP_ACTUATOR = Actuator-Level Closed Loop (Accelerator %-Torque)
+    * ActuatorControlMode::CLOSED_LOOP_VEHICLE = Vehicle-Level Closed Loop (Vehicle Speed)
+  */
+  if (raw_control_) {
+        accelerator_pedal_msg.pedal_cmd = data_.accelerator_pedal_joy * max_accelerator_pedal_;
+        accelerator_pedal_msg.control_type.value = raptor_dbw_msgs::msg::ActuatorControlMode::OPEN_LOOP;
+  }
+  else {
+        accelerator_pedal_msg.speed_cmd = data_.accelerator_pedal_joy; //
+        accelerator_pedal_msg.road_slope = 0;  // todo: get from localization topic
+        accelerator_pedal_msg.accel_limit = max_accel_;
+        accelerator_pedal_msg.control_type.value = raptor_dbw_msgs::ActuatorControlMode::CLOSED_LOOP_VEHICLE;
+  }
+
   pub_accelerator_pedal_->publish(accelerator_pedal_msg);
 
   // Brake
@@ -107,7 +137,17 @@ void RaptorDbwJoystick::cmdCallback()
   brake_msg.enable = true;
   brake_msg.rolling_counter = counter_;
   brake_msg.pedal_cmd = data_.brake_joy * 100;
-  brake_msg.control_type.value = raptor_dbw_msgs::msg::ActuatorControlMode::OPEN_LOOP;
+  /*
+  Brake pedal control types: Same as accelerator pedal
+  */
+  if (raw_control_) {
+        brake_msg.control_type.value = raptor_dbw_msgs::msg::ActuatorControlMode::OPEN_LOOP;
+  }
+  else {
+        brake_msg.control_type.value = raptor_dbw_msgs::ActuatorControlMode::closed_loop_vehicle;
+        brake_msg.decel_limit = max_decel_;
+  }
+
   pub_brake_->publish(brake_msg);
 
   // Steering
@@ -117,7 +157,14 @@ void RaptorDbwJoystick::cmdCallback()
   steering_msg.rolling_counter = counter_;
   steering_msg.angle_cmd = data_.steering_joy;
   steering_msg.angle_velocity = svel_;
-
+//  steering_msg.torque_cmd = 0.0; // torque
+//  steering_msg.vehicle_curvature_cmd = 0.0;  // 1/radius
+  /*
+  Steering control types:
+    * ActuatorControlMode::OPEN_LOOP = Open Loop (Steering %-Torque)
+    * ActuatorControlMode::CLOSED_LOOP_ACTUATOR = Actuator-Level Closed Loop (Steering Wheel Angular Position)
+    * ActuatorControlMode::CLOSED_LOOP_VEHICLE = Vehicle-Level Closed Loop (Vehicle Curvature)
+  */
   steering_msg.control_type.value = raptor_dbw_msgs::msg::ActuatorControlMode::CLOSED_LOOP_ACTUATOR;
   if (!data_.steering_mult) {
     steering_msg.angle_cmd *= 0.5;
@@ -168,12 +215,26 @@ void RaptorDbwJoystick::recvJoy(const Joy::SharedPtr msg)
 
   // Accelerator pedal
   if (data_.joy_accelerator_pedal_valid) {
-    data_.accelerator_pedal_joy = 0.5 - 0.5 * msg->axes[AXIS_ACCELERATOR_PEDAL];
+    if (raw_control_) {
+        data_.accelerator_pedal_joy = 0.5 - 0.5 * msg->axes[AXIS_ACCELERATOR_PEDAL];
+    }
+    else {
+        if (msg->axes[AXIS_ACCELERATOR_PEDAL] < 0.0) {
+            data_.accel_decel_limits = 0;
+        }
+    }
   }
 
   // Brake
   if (data_.joy_brake_valid) {
-    data_.brake_joy = 0.5 - 0.5 * msg->axes[AXIS_BRAKE];
+    if (raw_control_) {
+          data_.brake_joy = 0.5 - 0.5 * msg->axes[AXIS_BRAKE];
+      }
+    else {
+       if (msg->axes[AXIS_BRAKE] < 0.0) {
+           data_.accelerator_pedal_joy = 0;
+       }
+      }
   }
 
   // Gear
@@ -194,6 +255,26 @@ void RaptorDbwJoystick::recvJoy(const Joy::SharedPtr msg)
     ((fabs(msg->axes[AXIS_STEER_1]) >
     fabs(msg->axes[AXIS_STEER_2])) ? msg->axes[AXIS_STEER_1] : msg->axes[AXIS_STEER_2]);
   data_.steering_mult = msg->buttons[BTN_STEER_MULT_1] || msg->buttons[BTN_STEER_MULT_2];
+
+  // Speed increment for speed mode
+  if (!raw_control_) {
+    if (msg->axes[AXIS_SPEED_INCREMENT] != joy_.axes[AXIS_SPEED_INCREMENT]) {
+
+        if (msg->axes[AXIS_SPEED_INCREMENT] < -0.5) {
+          data_.accelerator_pedal_joy -= speed_increment_;
+          if (data_.accelerator_pedal_joy < 0)
+          {
+            data_.accelerator_pedal_joy = 0;
+          }
+        } else if (msg->axes[AXIS_SPEED_INCREMENT] > 0.5) {
+          data_.accelerator_pedal_joy += speed_increment_;
+          if (data_.accelerator_pedal_joy > max_speed_ * speed_increment_)
+          {
+            data_.accelerator_pedal_joy = max_speed_ * speed_increment_;
+          }
+        }
+    }
+  }
 
   // Turn signal
   if (msg->axes[AXIS_TURN_SIG] != joy_.axes[AXIS_TURN_SIG]) {

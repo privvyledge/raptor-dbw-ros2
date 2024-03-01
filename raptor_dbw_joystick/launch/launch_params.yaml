@@ -13,8 +13,17 @@
     max_steer_angle: 470.0
   # joy node
     device_id: 0
-#    device_name: "/dev/input/js0"
+    #device_name: "/dev/input/js0"
     deadzone: 0.5
     autorepeat_rate: 20.0
     sticky_buttons: false
     coalesce_interval_ms: 1
+  # speed control (closed loop) mode
+    raw_control: True
+    max_accelerator_pedal: 100.0
+    max_speed: 10.0
+    #min_speed: -10.0
+    max_accel: 3.0
+    max_decel: 3.0
+    speed_increment: 0.44704 # [m/s]. 0.44704 m/s = 1 MPH
+
