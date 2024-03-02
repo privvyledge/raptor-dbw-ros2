@@ -74,6 +74,8 @@ typedef struct
   int turn_signal_cmd;
   bool joy_accelerator_pedal_valid;
   bool joy_brake_valid;
+  float accel_limit;
+  float decel_limit;
 } JoystickDataStruct;
 
 /** \brief Class for sending control commands to NE Raptor DBW with a joystick. */
@@ -86,13 +88,27 @@ public:
  * \param[in] enable Whether joystick node can control enable/disable
  * \param[in] svel Steering angle velocity, deg/s
  * \param[in] max_steer_angle Maximum steering angle allowed, deg
+ * \param[in] raw_control True: control pedal percentage, False: set speed for PID, bool
+ * \param[in] max_accelerator_pedal Maximum accelerator pedal value, 0 < max_accelerator_pedal < 100
+ * \param[in] max_speed Maximum car speed, +ve
+ * \param[in] min_speed Minimum car speed, -ve
+ * \param[in] max_accel Maximum longitudinal acceleration, +ve
+ * \param[in] max_decel Minimum longitudinal deceleration (for braking), +ve
+ * \param[in] speed_increment value to raise the speed per button press, +ve. Recommended: 0.44704 m/s (i.e 1 MPH)
  */
   explicit RaptorDbwJoystick(
     const rclcpp::NodeOptions & options,
     bool ignore,
     bool enable,
     double svel,
-    float max_steer_angle);
+    float max_steer_angle,
+    bool raw_control,
+    double max_accelerator_pedal,
+    double max_speed,
+//    double min_speed,
+    double max_accel,
+    double max_decel,
+    double speed_increment);
 
 private:
   rclcpp::Clock m_clock;
@@ -125,6 +141,13 @@ private:
   bool enable_;     // Use enable and disable buttons
   double svel_;     // Steering command speed
   float max_steer_angle_;  // Maximum steering angle allowed
+  bool raw_control_;  // actuation type
+  double max_accelerator_pedal_;  // maximum accelerator pedal allowed
+  double max_speed_;  // maximum speed allowed
+//  double min_speed_;
+  double max_accel_;  // maximum acceleration
+  double max_decel_;  // maximum deceleration
+  double speed_increment_;  //
 
   // Variables
   rclcpp::TimerBase::SharedPtr timer_;
@@ -152,6 +175,7 @@ private:
     AXIS_STEER_1 = 0,             /**< Axis: steering wheel: - = clockwise, + = counterclockwise */
     AXIS_STEER_2 = 3,             /**< Axis: steering wheel: - = clockwise, + = counterclockwise */
     AXIS_TURN_SIG = 6,            /**< Axis: turn signals: - = right, + = left */
+    AXIS_SPEED_INCREMENT = 7,      /**< Axis: speed_increment: - = down_arrow, + = up_ */
     AXIS_COUNT = 8,               /**< Total number of axes (including unused) */
   };
 };
