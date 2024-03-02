@@ -45,7 +45,9 @@ RaptorDbwJoystick::RaptorDbwJoystick(
 //  double min_speed,
   double max_accel,
   double max_decel,
-  double speed_increment
+  double speed_increment,
+  double max_jerk_accel,
+  double max_jerk_decel,
   )
 : Node("raptor_dbw_joystick_node", options),
   ignore_{ignore},
@@ -58,7 +60,9 @@ RaptorDbwJoystick::RaptorDbwJoystick(
 //  min_speed_{min_speed},
   max_accel_{max_accel},
   max_decel_{max_decel},
-  speed_increment_{speed_increment}
+  speed_increment_{speed_increment},
+  max_jerk_accel_{max_jerk_accel},
+  max_jerk_decel_{max_jerk_decel},
 {
   data_.brake_joy = 0.0;
   data_.gear_cmd = Gear::NONE;
@@ -70,6 +74,8 @@ RaptorDbwJoystick::RaptorDbwJoystick(
   data_.joy_brake_valid = false;
   data_.accel_limit = max_accel_;
   data_.decel_limit = max_decel_;
+  data_.max_jerk_accel = max_jerk_accel_;
+  data_.max_jerk_decel = max_jerk_decel_;
 
   joy_.axes.resize(AXIS_COUNT, 0);
   joy_.buttons.resize(BTN_COUNT, 0);
@@ -132,7 +138,8 @@ void RaptorDbwJoystick::cmdCallback()
   else {
         accelerator_pedal_msg.speed_cmd = data_.accelerator_pedal_joy; //
         accelerator_pedal_msg.road_slope = 0;  // todo: get from localization topic
-        accelerator_pedal_msg.accel_limit = data_.accel_limit;
+        accelerator_pedal_msg.accel_limit = data_.accel_limit;  // m/s^2
+        accelerator_pedal_msg.accel_positive_jerk_limit = data_.max_jerk_accel_;  // m/s^3
         accelerator_pedal_msg.control_type.value = raptor_dbw_msgs::msg::ActuatorControlMode::CLOSED_LOOP_VEHICLE;
   }
 
@@ -151,7 +158,8 @@ void RaptorDbwJoystick::cmdCallback()
   }
   else {
         brake_msg.control_type.value = raptor_dbw_msgs::msg::ActuatorControlMode::CLOSED_LOOP_VEHICLE;
-        brake_msg.decel_limit = data_.decel_limit;
+        brake_msg.decel_limit = data_.decel_limit;  // m/s^2
+        brake_msg.decel_limit = data_.max_jerk_decel_;  // m/s^3
   }
   // (optional) Parking/emergency Brake command.  todo: map button for parking brake and test
   ParkingBrake parking_brake_msg;

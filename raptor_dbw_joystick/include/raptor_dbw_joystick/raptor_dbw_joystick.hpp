@@ -77,6 +77,8 @@ typedef struct
   bool joy_brake_valid;
   float accel_limit;
   float decel_limit;
+  float max_jerk_accel;
+  float max_jerk_decel;
 } JoystickDataStruct;
 
 /** \brief Class for sending control commands to NE Raptor DBW with a joystick. */
@@ -96,6 +98,8 @@ public:
  * \param[in] max_accel Maximum longitudinal acceleration, +ve
  * \param[in] max_decel Minimum longitudinal deceleration (for braking), +ve
  * \param[in] speed_increment value to raise the speed per button press, +ve. Recommended: 0.44704 m/s (i.e 1 MPH)
+ * \param[in] max_jerk_accel Maximum longitudinal jerk, +ve
+ * \param[in] max_jerk_decel Minimum longitudinal jerk (for reversing), +ve
  */
   explicit RaptorDbwJoystick(
     const rclcpp::NodeOptions & options,
@@ -109,7 +113,9 @@ public:
 //    double min_speed,
     double max_accel,
     double max_decel,
-    double speed_increment);
+    double speed_increment,
+    double max_jerk_accel,
+    double max_jerk_decel);
 
 private:
   rclcpp::Clock m_clock;
@@ -149,6 +155,8 @@ private:
   double max_accel_;  // maximum acceleration
   double max_decel_;  // maximum deceleration
   double speed_increment_;  //
+  double max_jerk_accel_;  // maximum forward jerk
+  double max_jerk_decel_;  // maximum reverse jerk
 
   // Variables
   rclcpp::TimerBase::SharedPtr timer_;

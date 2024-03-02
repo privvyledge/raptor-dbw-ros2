@@ -52,6 +52,8 @@ int main(int argc, char ** argv)
   temp->declare_parameter("max_accel", rclcpp::PARAMETER_DOUBLE);  // for speed mode
   temp->declare_parameter("max_decel", rclcpp::PARAMETER_DOUBLE);  // for speed mode
   temp->declare_parameter("speed_increment", rclcpp::PARAMETER_DOUBLE);  // for speed mode
+  temp->declare_parameter("max_jerk_accel", rclcpp::PARAMETER_DOUBLE);  // for speed mode
+  temp->declare_parameter("max_jerk_decel", rclcpp::PARAMETER_DOUBLE);  // for speed mode
 
   bool n_ignore = temp->get_parameter("ignore").as_bool();
   bool n_enable = temp->get_parameter("enable").as_bool();
@@ -65,6 +67,8 @@ int main(int argc, char ** argv)
   float n_max_accel = temp->get_parameter("max_accel").as_double();
   float n_max_decel = temp->get_parameter("max_decel").as_double();
   float n_speed_increment = temp->get_parameter("speed_increment").as_double();
+  float n_max_jerk_accel = temp->get_parameter("max_jerk_accel").as_double();
+  float n_max_jerk_decel = temp->get_parameter("max_jerk_decel").as_double();
 
   // Create RaptorDbwJoystick class
   auto node = std::make_shared<raptor_dbw_joystick::RaptorDbwJoystick>(
@@ -79,7 +83,9 @@ int main(int argc, char ** argv)
 //    n_min_speed,
     n_max_accel,
     n_max_decel,
-    n_speed_increment
+    n_speed_increment,
+    n_max_jerk_accel,
+    n_max_jerk_decel,
   );
 
   exec.add_node(node->get_node_base_interface());

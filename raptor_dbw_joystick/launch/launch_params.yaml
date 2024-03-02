@@ -23,9 +23,9 @@
     max_accelerator_pedal: 100.0
     max_speed: 10.0
     #min_speed: -10.0
-    max_accel: 1.0
-    max_decel: 3.0
+    max_accel: 1.0  # [m/s^2]
+    max_decel: 3.0  # [m/s^2]
     speed_increment: 0.44704 # [m/s]. 0.44704 m/s = 1 MPH
-    max_driving_jerk: 1.0
-    max_reversing_jerk: 3.0  # in reverse
+    max_jerk_accel: 1.0  # [m/s^3]
+    max_jerk_decel: 3.0  # [m/s^3] in reverse
 
