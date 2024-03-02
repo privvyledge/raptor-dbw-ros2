@@ -153,6 +153,12 @@ void RaptorDbwJoystick::cmdCallback()
         brake_msg.control_type.value = raptor_dbw_msgs::msg::ActuatorControlMode::CLOSED_LOOP_VEHICLE;
         brake_msg.decel_limit = data_.decel_limit;
   }
+  // (optional) Parking/emergency Brake command.  todo: map button for parking brake and test
+  ParkingBrake parking_brake_msg;
+  // valid options: NO_REQUEST, OFF, ON, FAULT
+  parking_brake_msg.status = raptor_dbw_msgs::msg::ParkingBrake::NO_REQUEST;
+//  brake_msg.park_brake_cmd = parking_brake_msg;
+  brake_msg.park_brake_cmd.status = raptor_dbw_msgs::msg::ParkingBrake::NO_REQUEST;
 
   pub_brake_->publish(brake_msg);
 

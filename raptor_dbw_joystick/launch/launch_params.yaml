@@ -8,7 +8,7 @@
   # DBW joystick node
     ignore: false
     enable: true
-    svel: 0.0
+    svel: 250.0  # maximum steering angle velocity
   # Shared with DBW CAN node
     max_steer_angle: 470.0
   # joy node
@@ -23,7 +23,9 @@
     max_accelerator_pedal: 100.0
     max_speed: 10.0
     #min_speed: -10.0
-    max_accel: 3.0
+    max_accel: 1.0
     max_decel: 3.0
     speed_increment: 0.44704 # [m/s]. 0.44704 m/s = 1 MPH
+    max_driving_jerk: 1.0
+    max_reversing_jerk: 3.0  # in reverse
 

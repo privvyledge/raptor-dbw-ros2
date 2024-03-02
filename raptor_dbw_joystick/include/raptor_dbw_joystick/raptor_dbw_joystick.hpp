@@ -60,6 +60,7 @@ using raptor_dbw_msgs::msg::GlobalEnableCmd;
 using raptor_dbw_msgs::msg::MiscCmd;
 using raptor_dbw_msgs::msg::SteeringCmd;
 using raptor_dbw_msgs::msg::TurnSignal;
+using raptor_dbw_msgs::msg::ParkingBrake;
 
 namespace raptor_dbw_joystick
 {
