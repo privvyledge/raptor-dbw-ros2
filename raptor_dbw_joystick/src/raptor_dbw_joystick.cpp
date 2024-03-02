@@ -342,3 +342,6 @@ void RaptorDbwJoystick::recvJoy(const Joy::SharedPtr msg)
 }
 
 }  // namespace raptor_dbw_joystick
+
+#include "rclcpp_components/register_node_macro.hpp"
+RCLCPP_COMPONENTS_REGISTER_NODE(RaptorDbwJoystick::RaptorDbwJoystick)
