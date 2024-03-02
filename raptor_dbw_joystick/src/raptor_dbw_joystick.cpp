@@ -88,6 +88,10 @@ RaptorDbwJoystick::RaptorDbwJoystick(
     pub_disable_ = this->create_publisher<Empty>("disable", 1);
   }
 
+  if (max_accelerator_pedal > 100.0) {
+    max_accelerator_pedal = 100.0;
+  }
+
   timer_ = this->create_wall_timer(200ms, std::bind(&RaptorDbwJoystick::cmdCallback, this));
 }
 
