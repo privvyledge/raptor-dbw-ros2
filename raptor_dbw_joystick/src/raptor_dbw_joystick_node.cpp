@@ -26,6 +26,15 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+/* todo: modify to use composition. See https://github.com/ros2/demos/blob/humble/composition/src/manual_composition.cpp
+    https://betterprogramming.pub/introduction-to-ros-2-and-dynamic-composition-a-gateway-to-advanced-robotics-782b459215ee
+    https://www.stereolabs.com/docs/ros2/ros2-composition
+    https://github.com/stereolabs/zed-ros2-examples/blob/master/tutorials/zed_rgb_convert/CMakeLists.txt
+    https://github.com/stereolabs/zed-ros2-wrapper/blob/master/zed_components/src/zed_camera/src/zed_camera_component.cpp
+    https://github.com/stereolabs/zed-ros2-wrapper/blob/eloquent/zed_wrapper/src/zed_wrapper.cpp
+    https://github.com/stereolabs/zed-ros2-wrapper/blob/eloquent/zed_wrapper/src/zed_wrapper.cpp
+*/
+
 #include "raptor_dbw_joystick/raptor_dbw_joystick.hpp"
 
 #include <memory>
