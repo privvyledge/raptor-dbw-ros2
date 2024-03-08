@@ -19,8 +19,8 @@
     sticky_buttons: false
     coalesce_interval_ms: 1
   # speed control (closed loop) mode
-    raw_control: True
-    max_accelerator_pedal: 100.0
+    raw_control: False
+    max_accelerator_pedal: 20.0
     max_speed: 10.0
     #min_speed: -10.0
     max_accel: 1.0  # [m/s^2]
